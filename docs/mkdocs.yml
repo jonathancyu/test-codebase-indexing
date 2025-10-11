@@ -1,0 +1,53 @@
+site_name: Application Documentation
+
+theme:
+  name: material
+  features:
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.share
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Local Development: 
+      - Overview: development/index.md
+  - Auth:
+      - Overview: auth/index.md
+      - Cognito User Setup: auth/setup.md
+      - Front End Auth: auth/front-end-auth.md
+      - Infra Auth: auth/infra.md
+  - Database:
+      - Overview: data-layer/index.md
+      - Data Model: data-layer/data-model.md
+      - Database Connectivity: data-layer/database-connectivity.md
+  - APIs:
+      - Overview: api/index.md
+      - API Specs: api/api-specs.md
+  - Frontend:
+      - Overview: frontend/index.md
+  - Infra:
+      - AWS CDK Stack: infra/cdk/index.md
+      - CI/CD: infra/cicd/index.md
+      - Environment Variables: infra/environment-variables/index.md
+  - Troubleshooting: troubleshooting/index.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+
+plugins:
+  - search
+  - render_swagger

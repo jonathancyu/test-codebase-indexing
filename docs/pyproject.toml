@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "docs"
+version = "0.1.0"
+description = "Documentation for the project"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "*.py"}]
+
+[tool.poetry.dependencies]
+python =  ">=3.11,<4.0"
+mkdocs = ">=1.6.1,<2.0.0"
+mkdocs-material = ">=9.6.9,<10.0.0"
+mkdocs-render-swagger-plugin = ">=0.1.2,<0.2.0"
+fastapi = ">=0.110.0,<1.0.0"
+uvicorn = ">=0.27.0,<1.0.0"
+boto3 = "^1.37.17"
+environment-variable-manager = "^0.2.1"
+service-connections = "^0.2.0"
+psycopg2 = "^2.9.10"
+h11 = "^0.16.0"
+setuptools = "^80.9.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+docs-generate-openapi = "generate_openapi_json:generate_openapi_json"
+docs-serve = "mkdocs:serve"
+
+[[tool.poetry.source]]
+name = "codeartifact"
+url = "https://packages-982534352120.d.codeartifact.us-west-2.amazonaws.com/pypi/pypi-store/simple/"
+priority = "supplemental"

@@ -1,0 +1,16 @@
+# AWS
+boto3>=1.26.0
+moto>=4.1.0
+
+# Testing
+pytest>=7.3.1
+pytest-mock>=3.10.0
+
+# Date/Time
+pytz>=2023.3
+
+# Logging
+python-json-logger>=2.0.7
+
+# Utils
+python-dateutil>=2.8.2

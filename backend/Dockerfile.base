@@ -1,0 +1,46 @@
+FROM python:3.11-slim
+
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+ARG AWS_SESSION_TOKEN
+
+ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+ENV AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+ENV PATH="/root/.local/bin:$PATH"
+ENV POETRY_VIRTUALENVS_CREATE=false
+ENV POETRY_VIRTUALENVS_IN_PROJECT=false
+
+# Install minimal system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install AWS CLI based on architecture
+RUN if [ "$(uname -m)" = "aarch64" ]; then \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"; \
+    else \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"; \
+    fi \
+    && unzip awscliv2.zip \
+    && ./aws/install \
+    && rm -rf aws awscliv2.zip
+
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Set up working directory
+WORKDIR /app
+
+# Configure CodeArtifact
+RUN --mount=type=secret,id=aws \
+    CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token \
+    --domain packages \
+    --region us-west-2 \
+    --domain-owner 982534352120 \
+    --query authorizationToken \
+    --output text) && \
+    poetry config repositories.codeartifact https://packages-982534352120.d.codeartifact.us-west-2.amazonaws.com/pypi/pypi-store/ && \
+    poetry config http-basic.codeartifact aws "${CODEARTIFACT_AUTH_TOKEN}" 
