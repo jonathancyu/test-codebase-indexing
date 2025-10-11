@@ -1,0 +1,276 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  font-family:
+    'Figtree',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Design System Colors */
+  --radius: 0.375rem; /* 6px */
+  --background: #ffffff;
+  --foreground: #262626;
+  --card: #ffffff;
+  --card-foreground: #262626;
+  --popover: #ffffff;
+  --popover-foreground: #262626;
+  --primary: #262626;
+  --primary-foreground: #ffffff;
+  --secondary: #d4d4d4;
+  --secondary-foreground: #262626;
+  --muted: #fafafa;
+  --muted-foreground: #525252;
+  --accent: #f5f5f5;
+  --accent-foreground: #262626;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #d4d4d4;
+  --input: #f5f5f5;
+  --ring: #0055d4;
+  --factory-blue: #0055d4;
+  --neutral-50: #fafafa;
+  --neutral-100: #f5f5f5;
+  --neutral-300: #d4d4d4;
+  --neutral-600: #525252;
+  --neutral-800: #262626;
+  --red-50: #fef2f2;
+  --red-300: #fca5a5;
+  --red-600: #dc2626;
+  --blue-50: #eff6ff;
+  --blue-600: #2563eb;
+
+  /* Sidebar colors */
+  --sidebar: #fafafa;
+  --sidebar-foreground: #262626;
+  --sidebar-primary: #262626;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f5f5f5;
+  --sidebar-accent-foreground: #262626;
+  --sidebar-border: #d4d4d4;
+  --sidebar-ring: #0055d4;
+}
+
+/* Typography Scale from Design System */
+.page-header {
+  font-family:
+    'Figtree',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  color: #262626;
+}
+
+.section-header {
+  font-family:
+    'Figtree',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #262626;
+}
+
+.sub-section {
+  font-family:
+    'Figtree',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #262626;
+}
+
+.button-text,
+.cta-text {
+  font-family:
+    'Figtree',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.main-body {
+  font-family:
+    'Figtree',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: #262626;
+}
+
+.meta-utility {
+  font-family:
+    'Figtree',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: #525252;
+}
+
+a {
+  font-weight: 500;
+  color: var(--primary);
+  text-decoration: inherit;
+}
+a:hover {
+  opacity: 0.8;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family:
+    'Figtree',
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Button Base Styles from Design System */
+.btn-base {
+  display: inline-flex;
+  padding: 10px 16px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px; /* 8px spacing between icon and text */
+  border-radius: 6px;
+  font-family:
+    'Figtree',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  cursor: pointer;
+}
+
+/* Button Variants from Design System */
+.btn-primary {
+  background-color: #262626;
+  color: #fafafa;
+}
+.btn-primary:hover {
+  background-color: #525252;
+}
+.btn-primary:disabled {
+  background-color: #d4d4d4;
+  color: #d4d4d4;
+}
+
+.btn-secondary {
+  background-color: #d4d4d4;
+  color: #262626;
+}
+.btn-secondary:hover {
+  background-color: #d4d4d4;
+}
+.btn-secondary:disabled {
+  background-color: #ffffff;
+  color: #d4d4d4;
+}
+
+.btn-tertiary {
+  background-color: #ffffff;
+  color: #2563eb;
+}
+.btn-tertiary:hover {
+  background-color: #eff6ff;
+}
+
+.btn-destructive {
+  background-color: #ffffff;
+  color: #dc2626;
+}
+.btn-destructive:hover {
+  background-color: #fef2f2;
+}
+.btn-destructive:disabled {
+  background-color: #ffffff;
+  color: #fca5a5;
+}
+
+/* Icon specifications */
+.btn-base svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 6px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

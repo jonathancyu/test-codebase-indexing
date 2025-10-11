@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Connect AWS account to GitHub federated OIDC and allow CDK deployment
+
+Parameters:
+  GitHubOrg:
+    Type: String
+    Description: GitHub Organization
+    Default: "8090-inc"
+  GitHubRepo:
+    Type: String
+    Description: GitHub Repository
+  GitHubStage:
+    Type: String
+    Description: GitHub Stage
+  ExistingOIDCProvider:
+    Type: String
+    Description: ARN of existing GitHub OIDC provider
+    Default: ""
+
+Conditions:
+  CreateOIDCProvider: !Equals [!Ref ExistingOIDCProvider, ""]
+
+Resources:
+  GitHubOIDCProvider:
+    Condition: CreateOIDCProvider
+    Type: "AWS::IAM::OIDCProvider"
+    Properties:
+      Url: "https://token.actions.githubusercontent.com"
+      ClientIdList:
+        - "sts.amazonaws.com"
+      ThumbprintList:
+        - "6938fd4d98bab03faadb97b34396831e3780aea1"
+        - "1c58a3a8518e8759bf075b76b750d4f2df264fcd"
+
+  GitHubActionsRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: !Sub "GitHubActionsRole-${GitHubOrg}-${GitHubRepo}-${GitHubStage}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Federated: !If
+                - CreateOIDCProvider
+                - !Ref GitHubOIDCProvider
+                - !Ref ExistingOIDCProvider
+            Action: "sts:AssumeRoleWithWebIdentity"
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: "sts.amazonaws.com"
+                token.actions.githubusercontent.com:sub: !Sub "repo:${GitHubOrg}/${GitHubRepo}:environment:${GitHubStage}"
+      Policies:
+        - PolicyName: "GitHubActionsPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "apigateway:*"
+                  - "lambda:*"
+                  - "secretsmanager:*"
+                  - "elasticache:*"
+                  - "dynamodb:*"
+                  - "s3:*"
+                  - "states:*"
+                  - "events:*"
+                  - "athena:*"
+                  - "rds:*"
+                  - "rds-db:*"
+                  - "cloudwatch:*"
+                  - "cloudformation:*"
+                  - "cloudtrail:*"
+                  - "cloudfront:*"
+                  - "logs:*"
+                  - "sts:AssumeRole"
+                  - "sqs:GetQueueAttributes"
+                  - "sqs:ListQueues"
+                  - "sqs:ReceiveMessage"
+                  - "dynamodb:GetItem"
+                  - "dynamodb:Query"
+                  - "dynamodb:Scan"
+                  - "kms:GenerateDataKey"
+                  - "kms:Decrypt"
+                  - "codeartifact:GetAuthorizationToken"
+                  - "codeartifact:ReadFromRepository"
+                  - "sts:GetServiceBearerToken"
+                  - "ssm:StartSession"
+                  - "ssm:TerminateSession"
+                  - "ssm:ResumeSession"
+                  - "ssm:DescribeSessions"
+                  - "ssm:GetConnectionStatus"
+                  - "ssm:DescribeInstanceProperties"
+                  - "ssm:DescribeInstanceInformation"
+                  - "ec2:DescribeInstances"
+                  - "ec2messages:*"
+                  - "ssmmessages:*"
+                Resource: "*"
+        - PolicyName: "S3PutObjectPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "s3:PutObject"
+                  - "s3:PutObjectAcl"
+                  - "s3:ListBucket"
+                Resource:
+                  - "arn:aws:s3:::*"
+                  - "arn:aws:s3:::*/*"
+
+Outputs:
+  RoleArn:
+    Description: "ARN of the GitHub Actions Role"
+    Value: !GetAtt GitHubActionsRole.Arn

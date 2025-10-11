@@ -1,0 +1,15 @@
+{
+    "cognito": {
+      "userPoolId": "us-west-2_k9iqpXnmF",
+      "userPoolClientId": "5ao2p58q8is5uis5jbfgcq7eka",
+      "identityPoolId": "us-west-2:86746f35-9ae6-4210-9b8e-47add21d0a08",
+      "domain": "",
+      "region": "us-west-2"
+    },
+    "cloudfront": {
+      "domain": "d3v5uq8qksy1v0.cloudfront.net"
+    },
+    "apiUrl": "http://localhost:8000",
+    "staticSiteDomainName": "factory.dev.8090.dev"
+  }
+  

@@ -1,0 +1,185 @@
+x-common-env: &common-env
+  AWS_DEFAULT_REGION: ${AWS_REGION:-us-west-2}
+  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+  AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
+  AWS_REGION: ${AWS_REGION:-us-west-2}
+  STACK_NAME: ${STACK_NAME}
+  DEBUG_LEVEL: ${DEBUG_LEVEL:-INFO}
+  LOCAL_DATABASE: ${LOCAL_DATABASE:-true}
+  ENVIRONMENT_VARIABLES_SECRET_NAME: ${ENVIRONMENT_VARIABLES_SECRET_NAME}
+
+services:
+  backend-base:
+    image: backend-base
+    container_name: backend-base
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.base
+      args:
+        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+        AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      <<: *common-env
+      VITE_USE_LOCAL_API: ${VITE_USE_LOCAL_API}
+      PORT: "3000"
+    command: pnpm dev
+    networks:
+      - three-tier-app-network
+    profiles:
+      - local-api-local-db
+      - local-api-deployed-db
+      - deployed-api-deployed-db
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:3000" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  api:
+    container_name: api
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+      additional_contexts:
+        backend-base: "service:backend-base"
+      args:
+        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+        AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
+    volumes:
+      - ./backend:/app
+      - ~/.aws:/root/.aws:ro
+    ports:
+      - "8000:8000"
+    environment:
+      <<: *common-env
+      LOCAL_DATABASE: ${LOCAL_DATABASE:-true}
+      DB_HOST: "service-connections"
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-postgres}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DEPLOYMENT_TYPE: docker
+      RDS_PROXY_ENDPOINT: ${RDS_PROXY_ENDPOINT}
+    networks:
+      - three-tier-app-network
+    command: bash /app/start_api.sh
+    profiles:
+      - local-api-local-db
+      - local-api-deployed-db
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      service-connections:
+        condition: service_healthy
+        required: false
+
+  postgres:
+    container_name: postgres
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - three-tier-app-network
+    profiles:
+      - local-api-local-db
+    command:
+      - "postgres"
+      - "-c"
+      - "ssl=off"
+
+  db-init:
+    container_name: db-init
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+      args:
+        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+        AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
+      additional_contexts:
+        backend-base: "service:backend-base"
+    volumes:
+      - ./backend:/app
+    environment:
+      <<: *common-env
+      LOCAL_DATABASE: "true"
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: postgres
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DEPLOYMENT_TYPE: docker
+      PYTHONPATH: /app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - three-tier-app-network
+    command: bash /app/start_db_migrations.sh
+    profiles:
+      - local-api-local-db
+
+  service-connections:
+    container_name: service-connections
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.service-connections
+      args:
+        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+        AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
+      additional_contexts:
+        backend-base: "service:backend-base"
+    environment:
+      <<: *common-env
+    volumes:
+      - ./backend:/app
+      - ~/.aws:/root/.aws:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - three-tier-app-network
+    command: python start_port_forward.py
+    profiles:
+      - local-api-deployed-db
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5432" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
+
+
+networks:
+  three-tier-app-network:
+    driver: bridge

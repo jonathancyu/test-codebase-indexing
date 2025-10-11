@@ -1,0 +1,6 @@
+{
+  "context": {
+    "@aws-cdk/aws-ec2:uniqueImdsv2TemplateName": true
+  },
+  "app": "node dist/src/main.js"
+}

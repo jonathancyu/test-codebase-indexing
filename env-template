@@ -1,0 +1,27 @@
+DEPLOYMENT_TYPE=local
+
+# AWS Settings
+AWS_REGION=us-west-2
+STACK_NAME=PROJECT_NAME_PLACEHOLDER-infra-dev
+
+# Database Settings
+DB_NAME=postgres
+DB_USERNAME=postgres
+
+# For local development
+PROXY_ENDPOINT=host.docker.internal:5432
+
+# For local database (optional)
+USE_LOCAL_DB=false
+LOCAL_DB_HOST=localhost
+LOCAL_DB_PORT=5432
+LOCAL_DB_PASSWORD=postgres
+
+# Optional Settings
+LOG_LEVEL=INFO 
+
+# VITE Config
+VITE_USE_LOCAL_API=true
+
+# Environment variables secret name
+ENVIRONMENT_VARIABLES_SECRET_NAME=PROJECT_NAME_PLACEHOLDER-infra-dev-EnvironmentVariables

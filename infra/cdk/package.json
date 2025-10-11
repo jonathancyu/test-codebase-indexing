@@ -1,0 +1,52 @@
+{
+  "name": "@PROJECT_NAME_PLACEHOLDER/cdk",
+  "version": "0.1.0",
+  "main": "dist/src/main.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch --passWithNoTests",
+    "test:coverage": "jest --coverage --passWithNoTests",
+    "cdk": "cdk",
+    "deploy": "pnpm run build && cdk deploy",
+    "deploy:env": "pnpm run build && cdk deploy --all --require-approval never",
+    "deploy:dev": "ENVIRONMENT=dev pnpm run deploy:env",
+    "deploy:stage": "ENVIRONMENT=stage pnpm run deploy:env",
+    "deploy:prod": "ENVIRONMENT=prod pnpm run deploy:env",
+    "deploy:all": "pnpm run build && cdk deploy --all --require-approval never",
+    "destroy": "cdk destroy",
+    "destroy:env": "cdk destroy --all --force",
+    "destroy:dev": "ENVIRONMENT=dev pnpm run destroy:env",
+    "destroy:stage": "ENVIRONMENT=stage pnpm run destroy:env",
+    "destroy:prod": "ENVIRONMENT=prod pnpm run destroy:env",
+    "diff": "cdk diff",
+    "diff:env": "cdk diff",
+    "diff:dev": "ENVIRONMENT=dev pnpm run diff:env",
+    "diff:stage": "ENVIRONMENT=stage pnpm run diff:env",
+    "diff:prod": "ENVIRONMENT=prod pnpm run diff:env",
+    "synth": "cdk synth",
+    "list": "cdk list",
+    "clean": "rm -rf dist cdk.out"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.0",
+    "aws-cdk": "^2.1029.2",
+    "globals": "^15.14.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.7.3"
+  },
+  "dependencies": {
+    "@8090-inc/api-gateway": "^0.6.1",
+    "@8090-inc/aurora-rds": "^0.5.1",
+    "@8090-inc/cognito": "^0.6.0",
+    "@8090-inc/static-site": "^0.1.0",
+    "@8090-inc/vpc": "^0.5.1",
+    "aws-cdk-lib": "^2.216.0",
+    "constructs": "^10.4.2",
+    "source-map-support": "^0.5.21"
+  }
+}
