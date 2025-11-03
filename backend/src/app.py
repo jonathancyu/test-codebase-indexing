@@ -10,7 +10,7 @@ env_vars = set_env_vars_from_aws(
     secret_name=os.environ["ENVIRONMENT_VARIABLES_SECRET_NAME"]
 )
 
-from src.controllers import health_controller, user_controller
+from src.controllers import health_controller, user_controller, wine_controller
 
 # Configure logging
 logging.basicConfig(
@@ -73,6 +73,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 # Include routers
 app.include_router(user_controller.router, prefix="/api/v1")
+app.include_router(wine_controller.router, prefix="/api/v1")
 app.include_router(health_controller.router, prefix="/api/v1")
 
 

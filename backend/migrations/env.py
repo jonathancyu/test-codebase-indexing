@@ -8,7 +8,12 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 backend_dir = os.path.abspath(os.path.join(current_dir, ".."))
 sys.path.append(backend_dir)
 
-from src.models.user_models import Base
+from src.models.user_models import Base as UserBase
+from src.models.wine_models import Base as WineBase
+
+# Merge metadata from all models
+Base = UserBase
+Base.metadata.tables.update(WineBase.metadata.tables)
 
 # this is the Alembic Config object
 config = context.config
